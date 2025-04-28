@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
+import 'package:game_poc/models/car.dart';
 
 void main() => runApp(MyApp());
 
@@ -26,11 +28,27 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  late WidgetBuilder car;
+  late Ticker ticker;
+  double elapsedSeconds = 0;
+
+  @override
+  void initState() {
+    ticker = Ticker((elapsed) {
+      setState(() {
+        elapsedSeconds = elapsed.inMilliseconds.toDouble() / 1000;
+      });
+    });
+    ticker.start();
+    car = (context) => ExampleCar(elapsedSeconds: elapsedSeconds);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(child: const Text('some input here')),
+      body: Stack(children: [SizedBox.expand(child: car!(context))]),
     );
   }
 }
